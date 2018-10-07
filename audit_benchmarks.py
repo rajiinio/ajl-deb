@@ -19,6 +19,13 @@ F_API_SEC = os.environ['F_API_SEC']
 
 
 class AuditBenchmark:
+
+    """
+    Generate prediction results and optionally confidence scores
+    for each corporate black box model for a given benchmark dataset.
+
+    """
+
     def __init__(self,
                  k_api_id=K_API_ID,
                  k_api_key=K_API_KEY,
@@ -194,6 +201,7 @@ class AuditBenchmark:
             print(line)
             dict_list.append(line)
 
+
         return dict_list
 
     def write_results(self, dict_list, output_file):
@@ -210,7 +218,7 @@ if __name__ == "__main__" :
     parser.add_argument('--input_csv_file', '-i', required=True, help='input csv file with benchmark data')
     parser.add_argument('--output_csv_file', '-o', default=None, help='output csv file with audit results for api')
     parser.add_argument('--url_input', '-u', action='store_true', help='Flag if url input instead of local file input')
-    parser.add_argument('--base_dir', '-b', default=None, help='base directory for input files')
+    parser.add_argument('--base_dir', '-b', default='/Users/deborahraji/Downloads/allPPB-Original/', help='base directory for input files')
     parser.add_argument('--filter', '-f', default='A,K,M,F,I', help='Indicate company APIs to be audited, represented by first letter of company names, seperated by commas. '
                                                                     'Default is "A,K,M,F,I" for all available APIs - Amazon, Kairos, Microsoft, Face++, and IBM. '
                                                                     'Any desired subset of this list is allowed, excluding an empty list.   ')
