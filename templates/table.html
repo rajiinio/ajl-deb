@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Audit Results</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>All</th>
+        <th>Females</th>
+	<th>Males</th>
+	<th>Darker</th>
+	<th>Lighter</th>
+	<th>DF</th>
+	<th>DM</th>
+	<th>LF</th>
+	<th>LM</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>N</th>
+        <th>{{results["All"][0]}}</th>
+        <th>{{results["Females"][0]}}</th>
+        <th>{{results["Males"][0]}}</th>
+        <th>{{results["Darker"][0]}}</th>
+        <th>{{results["Lighter"][0]}}</th>
+        <th>{{results["DF"][0]}}</th>
+        <th>{{results["DM"][0]}}</th>
+        <th>{{results["LF"][0]}}</th>
+        <th>{{results["LM"][0]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} NA (Face not Processed)</th>
+        <th>{{results["All"][1]}}</th>
+        <th>{{results["Females"][1]}}</th>
+        <th>{{results["Males"][1]}}</th>
+        <th>{{results["Darker"][1]}}</th>
+        <th>{{results["Lighter"][1]}}</th>
+        <th>{{results["DF"][1]}}</th>
+        <th>{{results["DM"][1]}}</th>
+        <th>{{results["LF"][1]}}</th>
+        <th>{{results["LM"][1]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} FALSE (Misgendered)</th>
+        <th>{{results["All"][2]}}</th>
+        <th>{{results["Females"][2]}}</th>
+        <th>{{results["Males"][2]}}</th>
+        <th>{{results["Darker"][2]}}</th>
+        <th>{{results["Lighter"][2]}}</th>
+        <th>{{results["DF"][2]}}</th>
+        <th>{{results["DM"][2]}}</th>
+        <th>{{results["LF"][2]}}</th>
+        <th>{{results["LM"][2]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} TRUE </th>
+	<th>{{results["All"][3]}}</th>
+        <th>{{results["Females"][3]}}</th>
+        <th>{{results["Males"][3]}}</th>
+        <th>{{results["Darker"][3]}}</th>
+        <th>{{results["Lighter"][3]}}</th>
+        <th>{{results["DF"][3]}}</th>
+        <th>{{results["DM"][3]}}</th>
+        <th>{{results["LF"][3]}}</th>
+        <th>{{results["LM"][3]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} Accuracy on Processed Faces </th>
+        <th>{{results["All"][4]}}</th>
+        <th>{{results["Females"][4]}}</th>
+        <th>{{results["Males"][4]}}</th>
+        <th>{{results["Darker"][4]}}</th>
+        <th>{{results["Lighter"][4]}}</th>
+        <th>{{results["DF"][4]}}</th>
+        <th>{{results["DM"][4]}}</th>
+        <th>{{results["LF"][4]}}</th>
+        <th>{{results["LM"][4]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} Error on Processed Faces </th>
+        <th>{{results["All"][5]}}</th>
+        <th>{{results["Females"][5]}}</th>
+        <th>{{results["Males"][5]}}</th>
+        <th>{{results["Darker"][5]}}</th>
+        <th>{{results["Lighter"][5]}}</th>
+        <th>{{results["DF"][5]}}</th>
+        <th>{{results["DM"][5]}}</th>
+        <th>{{results["LF"][5]}}</th>
+        <th>{{results["LM"][5]}}</th>
+      </tr>
+      <tr>
+        <th>{{model}} Overall Error (Face Not Processed or Misgendered) </th>
+        <th>{{results["All"][6]}}</th>
+        <th>{{results["Females"][6]}}</th>
+        <th>{{results["Males"][6]}}</th>
+        <th>{{results["Darker"][6]}}</th>
+        <th>{{results["Lighter"][6]}}</th>
+        <th>{{results["DF"][6]}}</th>
+        <th>{{results["DM"][6]}}</th>
+        <th>{{results["LF"][6]}}</th>
+        <th>{{results["LM"][6]}}</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
+
