@@ -6,7 +6,6 @@ import boto3
 import argparse
 import base64
 import csv
-import subprocess
 import time
 from watson_developer_cloud import VisualRecognitionV3, WatsonApiException
 
@@ -48,15 +47,15 @@ class AuditBenchmark:
 
         self.cli = boto3.client('rekognition', 'us-east-1')
 
-    def _image_to_bytes(self, filename, b64_format=False):
-        with open(filename, "rb") as imageFile:
-            if not b64_format:
-                return imageFile.read()
-            else:
-                return str(base64.b64encode(imageFile.read()))[2:-1]
+    def _image_to_bytes(self, img_input, url=False):
 
-    def a_detect_faces(self, input):
-        img_bytes = self._image_to_bytes(input)
+        if url:
+            return requests.get(img_input).content
+        else:
+            with open(img_input, "rb") as imageFile:
+                return imageFile.read()
+
+    def a_detect_faces(self, img_bytes):
         response = self.cli.detect_faces(
             Image={
             "Bytes": img_bytes,
@@ -75,9 +74,8 @@ class AuditBenchmark:
 
         return gender #confidence
 
-    def k_detect_faces(self, input):
-        img_bytes = self._image_to_bytes(input, True)
-        # put your keys in the header
+    def k_detect_faces(self, img_bytes):
+        img_bytes = str(base64.b64encode(img_bytes))[2:-1]
         headers = {
             "app_id": self.k_api_id,
             "app_key": self.k_api_key
@@ -97,13 +95,13 @@ class AuditBenchmark:
                 print(r.content)
                 print(r)
                 gender = 'n/a'
-                time.sleep(60)
+                time.sleep(1)
                 count += 1
 
 
         return gender.lower()
 
-    def m_detect_faces(self, input):
+    def m_detect_faces(self, img_bytes):
         # You must use the same region in your REST call as you used to get your
         # subscription keys. For example, if you got your subscription keys from
         # westus, replace "westcentralus" in the URI below with "westus".
@@ -112,7 +110,6 @@ class AuditBenchmark:
         # If you use a free trial subscription key, you shouldn't need to change
         # this region.
         face_api_url = 'https://eastus.api.cognitive.microsoft.com/face/v1.0/detect'
-        img_bytes = self._image_to_bytes(input)
         headers = {'Ocp-Apim-Subscription-Key': self.m_subscription_key,
                "Content-Type": "application/octet-stream"}
         params = {
@@ -132,15 +129,14 @@ class AuditBenchmark:
             except:
                 print('bad_request_m %d' %count)
                 gender = 'n/a'
-                time.sleep(60)
+                time.sleep(1)
                 count += 1
 
         return gender
 
 
 
-    def i_detect_faces(self, input):
-        img_bytes = self._image_to_bytes(input)
+    def i_detect_faces(self, img_bytes):
         try:
             face_result = self.visual_recognition.detect_faces(images_file=img_bytes)
             gender = face_result['images'][0]['faces'][0]['gender']['gender'][0].lower()
@@ -149,13 +145,24 @@ class AuditBenchmark:
 
         return gender
 
-    def f_detect_faces(self, input):
-        cmd = 'curl -X POST https://api-us.faceplusplus.com/facepp/v3/detect -F api_key=%s -F api_secret=%s -F image_file=@%s -F return_landmark=1 -F return_attributes=gender,age' %(self.f_api_key, self.f_api_secret, input)
+    def f_detect_faces(self, img_bytes):
+        img_bytes = str(base64.b64encode(img_bytes))[2:-1]
+        endpoint = 'https://api-us.faceplusplus.com'
+        response = requests.post(
+            endpoint + '/facepp/v3/detect',
+            {
+                'api_key': self.f_api_key,
+                'api_secret': self.f_api_secret,
+                'image_base64': img_bytes,
+                'return_landmark': 1,
+                'return_attributes': 'gender,age'
+            }
+        )
+
         count = 0
         while count <= 30:
             try:
-                response = subprocess.run(cmd.split(" "), stdout=subprocess.PIPE)
-                gender = json.loads(response.stdout)['faces'][0]['attributes']['gender']['value'][0].lower()
+                gender = json.loads(response.content)['faces'][0]['attributes']['gender']['value'][0].lower()
                 break
             except:
                 print('bad_request %d' % count)
@@ -166,7 +173,7 @@ class AuditBenchmark:
 
         return gender
 
-    def get_results(self, input_file, base_dir, filter):
+    def get_results(self, input_file, base_dir, filter, url_input=False):
         filter = filter.split(',')
         func_dict = {
             "A": ["Amazon", self.a_detect_faces],
@@ -181,13 +188,16 @@ class AuditBenchmark:
 
             #TO DO: Generalize to other target outputs
             gender = line['Gender'][0].lower()
-            #TO DO: handle url input
-            filename = base_dir + line['filename']
+            if url_input:
+                img_input = line['url']
+            else:
+                img_input = base_dir + line['filename']
 
-            # TO DO: cycle more effeciently through api companies
+            img_bytes = self._image_to_bytes(img_input=img_input, url=url_input)
+
             for item in filter:
                 print(item)
-                predicted_gen = func_dict[item][1](filename)
+                predicted_gen = func_dict[item][1](img_bytes)
                 results_title = func_dict[item][0]+' Results'
                 class_acc_title = 'Classifier ' + func_dict[item][0]
                 line[results_title] = predicted_gen
@@ -227,7 +237,7 @@ if __name__ == "__main__" :
 
     audit = AuditBenchmark()
     # regardless, you want to print the numeric results
-    data_dict = audit.get_results(args.input_csv_file, args.base_dir, args.filter)
+    data_dict = audit.get_results(args.input_csv_file, args.base_dir, args.filter, args.url_input)
 
     if args.output_csv_file:
         audit.write_results(data_dict, args.output_csv_file)
