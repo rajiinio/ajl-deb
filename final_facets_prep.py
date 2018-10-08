@@ -30,12 +30,10 @@ class FacetsPrep:
                csv_file,
                base_dir,
                filter,
-               url_input=False,
                get_results=False):
 
     self.csv_file = csv_file
     self.base_dir = base_dir
-    self.url_input = url_input
     self.get_results = get_results
     self.filter = filter
     self.filename = 'audit_results'
@@ -77,7 +75,7 @@ class FacetsPrep:
     PIL_concept_images = []
 
     for line in dict_list:
-      if self.url_input:
+      if 'url' in line.keys():
           fd = urllib.request.urlopen(line['url'])
           img_file = io.BytesIO(fd.read())
       else:
@@ -124,7 +122,7 @@ class FacetsPrep:
     #generate results first
     if self.get_results:
         audit = AuditBenchmark()
-        res_dict = audit.get_results(self.csv_file, self.base_dir, self.filter, self.url_input)
+        res_dict = audit.get_results(self.csv_file, self.base_dir, self.filter)
         csv_data = pd.DataFrame.from_dict(res_dict)
     else:
         csv_data = pd.DataFrame.from_csv(self.csv_file)
@@ -169,7 +167,6 @@ class FacetsPrep:
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_csv_file', '-i', required=True, help='input csv file with benchmark data')
-    parser.add_argument('--url_input', '-u', action='store_true', help='Flag if url input instead of local file input')
     parser.add_argument('--get_results', '-r', action='store_true', help='Flag if we need to populate csv with results before rehosting')
     parser.add_argument('--base_dir', '-b', default='/Users/deborahraji/Downloads/allPPB-Original/', help='base directory for input files')
     parser.add_argument('--filter', '-f', default='A,K,M,F,I', help='Indicate company APIs to be audited, represented by first letter of company names, seperated by commas. '
@@ -177,13 +174,9 @@ if __name__ == "__main__" :
                                                                     'Any desired subset of this list is allowed, excluding an empty list.   ')
 
     args = parser.parse_args()
-    #set url flag
-    url = False
-    if args.url_input:
-        url = False
 
     #initate
-    fprep = FacetsPrep(args.input_csv_file, args.base_dir, args.filter, args.url_input, args.get_results)
+    fprep = FacetsPrep(args.input_csv_file, args.base_dir, args.filter, args.get_results)
     url_stem = fprep.generate_url()
     print(url_stem)
 

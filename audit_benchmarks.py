@@ -173,7 +173,7 @@ class AuditBenchmark:
 
         return gender
 
-    def get_results(self, input_file, base_dir, filter, url_input=False):
+    def get_results(self, input_file, base_dir, filter):
         filter = filter.split(',')
         func_dict = {
             "A": ["Amazon", self.a_detect_faces],
@@ -187,9 +187,11 @@ class AuditBenchmark:
         for line in reader:
 
             #TO DO: Generalize to other target outputs
+            url_input = False
             gender = line['Gender'][0].lower()
-            if url_input:
+            if 'url' in line.keys():
                 img_input = line['url']
+                url_input = True
             else:
                 img_input = base_dir + line['filename']
 
@@ -227,7 +229,6 @@ if __name__ == "__main__" :
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_csv_file', '-i', required=True, help='input csv file with benchmark data')
     parser.add_argument('--output_csv_file', '-o', default=None, help='output csv file with audit results for api')
-    parser.add_argument('--url_input', '-u', action='store_true', help='Flag if url input instead of local file input')
     parser.add_argument('--base_dir', '-b', default='/Users/deborahraji/Downloads/allPPB-Original/', help='base directory for input files')
     parser.add_argument('--filter', '-f', default='A,K,M,F,I', help='Indicate company APIs to be audited, represented by first letter of company names, seperated by commas. '
                                                                     'Default is "A,K,M,F,I" for all available APIs - Amazon, Kairos, Microsoft, Face++, and IBM. '
@@ -237,7 +238,7 @@ if __name__ == "__main__" :
 
     audit = AuditBenchmark()
     # regardless, you want to print the numeric results
-    data_dict = audit.get_results(args.input_csv_file, args.base_dir, args.filter, args.url_input)
+    data_dict = audit.get_results(args.input_csv_file, args.base_dir, args.filter)
 
     if args.output_csv_file:
         audit.write_results(data_dict, args.output_csv_file)

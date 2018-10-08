@@ -16,8 +16,10 @@ def index():
  
 @app.route("/viz")
 def viz():
-    #step 1 : automatically generate json and png files + name them and rehost and replace the url in quickdraw.html
-    #step 2 : launch demo via Bazel in different window
+    # TO DO
+    #step 1 (DONE in FacetsPrep method): automatically generate json and png files + name them and rehost
+    #step 2 :replace the url in quickdraw.html
+    #step 3 : launch demo via Bazel in different window
     return redirect('http://deborahs-air.lan:6006/facets-dive/demo/quickdraw.html')
 
 @app.route('/upload')
@@ -27,6 +29,7 @@ def upload_file():
 @app.route('/uploader', methods = ['GET', 'POST'])
 def uploadr_file():
    if request.method == 'POST':
+      #TO DO : allow for button w/ url vs photo submission
       f = request.files['file']
       base_dir = request.form['Name'] #Example: '/Users/deborahraji/Downloads/allPPB-Original/'
       model = request.form['submit_button'][0]
